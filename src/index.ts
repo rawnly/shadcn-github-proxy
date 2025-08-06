@@ -7,6 +7,7 @@ import { Hono } from "hono";
 import CacheWithTTL from "./cache";
 import Github from "./github";
 import { NodeSDKLive } from "./otel";
+import limiter from "./ratelimit";
 
 if (process.env.SENTRY_DSN) {
 	Sentry.init({
@@ -37,6 +38,8 @@ class Server extends Effect.Service<Server>()("shadcn-github-proxy", {
 			Effect.repeat(Schedule.spaced("1 minute")),
 			Effect.forkDaemon,
 		);
+
+		app.use("*", limiter);
 
 		app.all("/", (c) =>
 			c.redirect("https://github.com/rawnly/shadcn-github-proxy"),
