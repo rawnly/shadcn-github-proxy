@@ -1,8 +1,10 @@
 {
 	"compilerOptions": {
 		"strict": true,
+		"resolveJsonModule": true,
 		"jsx": "react-jsx",
 		"jsxImportSource": "hono/jsx",
-		"downlevelIteration": true
+		"downlevelIteration": true,
+		"esModuleInterop": true
 	}
 }

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/bun";
 import type { Resource } from "@effect/opentelemetry";
 import { FetchHttpClient, type HttpClient, Path } from "@effect/platform";
 import { BunRuntime } from "@effect/platform-bun/index";
@@ -6,6 +7,12 @@ import { Hono } from "hono";
 import CacheWithTTL from "./cache";
 import Github from "./github";
 import { NodeSDKLive } from "./otel";
+
+if (process.env.SENTRY_DSN) {
+	Sentry.init({
+		dsn: process.env.SENTRY_DSN,
+	});
+}
 
 class Server extends Effect.Service<Server>()("shadcn-github-proxy", {
 	dependencies: [
@@ -98,6 +105,18 @@ class Server extends Effect.Service<Server>()("shadcn-github-proxy", {
 
 		const PORT = process.env.PORT || 8000;
 		yield* Effect.log(`Server is running on port ${PORT}`);
+
+		if (process.env.SENTRY_DSN) {
+			yield* Effect.log("Sentry is enabled");
+		}
+
+		if (process.env.GH_TOKEN) {
+			yield* Effect.log("Running with GitHub token authentication");
+		} else {
+			yield* Effect.log(
+				"Running without GitHub token authentication, rate limits may apply",
+			);
+		}
 
 		return Bun.serve({
 			fetch: app.fetch,
