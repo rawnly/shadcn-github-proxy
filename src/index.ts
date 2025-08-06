@@ -31,6 +31,10 @@ class Server extends Effect.Service<Server>()("shadcn-github-proxy", {
 			Effect.forkDaemon,
 		);
 
+		app.all("/", (c) =>
+			c.redirect("https://github.com/rawnly/shadcn-github-proxy"),
+		);
+
 		app.get("/:owner/:repo/:filepath{.*\\.json}", (c) =>
 			Runtime.runPromise(
 				runtime,
