@@ -3,10 +3,7 @@ import { rateLimiter, type Store } from "hono-rate-limiter";
 import { RedisStore } from "rate-limit-redis";
 
 const store = new RedisStore({
-  sendCommand: (command, ...args) => {
-    console.log("Redis command:", command, args);
-    return redis.send(command, args ?? []);
-  },
+  sendCommand: (command, ...args) => redis.send(command, args ?? []),
   prefix: "gh-reatelimit:",
 }) as unknown as Store;
 
