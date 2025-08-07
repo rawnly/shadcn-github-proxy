@@ -4,8 +4,8 @@ import {
 	HttpClientRequest,
 } from "@effect/platform";
 
-import { Array as Arr, Effect, Option, Schema } from "effect";
-import { FilesResponse, type TreeItem } from "./schema";
+import { Array as Arr, Console, Effect, Option, Schema } from "effect";
+import { FilesResponse, PartialRegistryItem, type TreeItem } from "./schema";
 
 export default class Github extends Effect.Service<Github>()(
 	"registry-service",
@@ -69,6 +69,25 @@ export default class Github extends Effect.Service<Github>()(
 						`https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${item.path}`,
 					)
 					.pipe(Effect.andThen((res) => res.json));
+
+				const o = Schema.decodeUnknownOption(PartialRegistryItem)(response);
+
+				if (Option.isNone(o)) {
+					return response;
+				}
+
+				(response as any).registryDependencies = (
+					response as any
+				).registryDependencies.map((s: string) => {
+					const url = new URL(s);
+					url.host = "gh-registry.untitled.dev";
+					url.pathname =
+						`/${owner}/${repo}/${url.pathname.replace("r/", "")}`.replace(
+							"//",
+							"/",
+						);
+					return url.toString();
+				});
 
 				return response;
 			});

@@ -15,3 +15,7 @@ export const FilesResponse = Schema.Struct({
 });
 
 export type FilesResponse = Schema.Schema.Type<typeof FilesResponse>;
+
+export const PartialRegistryItem = Schema.Struct({
+	registryDependencies: Schema.Array(Schema.String),
+});
